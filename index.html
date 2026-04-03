@@ -90,31 +90,34 @@
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      padding: 2rem;
+      padding: 1.5rem;
       text-align: center;
       transition: opacity 0.5s ease, visibility 0.5s ease;
+      overflow: hidden;
     }
     #splash-screen.hidden {
       opacity: 0;
       visibility: hidden;
     }
     .splash-icon {
-      width: 80px;
-      height: 80px;
+      width: clamp(50px, 12vh, 80px);
+      height: clamp(50px, 12vh, 80px);
       color: var(--accent);
-      margin-bottom: 1.5rem;
+      margin-bottom: clamp(1rem, 3vh, 1.5rem);
+      flex-shrink: 0;
     }
     .splash-title {
-      font-size: clamp(1.5rem, 6vw, 2.5rem);
+      font-size: clamp(1.2rem, 6vw, 2.5rem);
       font-weight: 800;
-      margin-bottom: 1rem;
-      word-break: break-word;
-      hyphens: auto;
+      margin-bottom: clamp(0.5rem, 2vh, 1rem);
+      line-height: 1.2;
+      word-break: normal;
+      hyphens: none;
     }
     .splash-desc {
-      font-size: clamp(0.95rem, 3vw, 1.1rem);
+      font-size: clamp(0.85rem, 3vw, 1.1rem);
       color: var(--text-muted);
-      margin-bottom: 2.5rem;
+      margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
       max-width: 500px;
       line-height: 1.5;
     }
@@ -122,8 +125,8 @@
       background-color: var(--accent);
       color: #ffffff;
       border: none;
-      padding: 1rem 3rem;
-      font-size: 1.1rem;
+      padding: clamp(0.8rem, 2vh, 1rem) clamp(2rem, 6vw, 3rem);
+      font-size: clamp(0.95rem, 3vw, 1.1rem);
       font-weight: 700;
       border-radius: 99px;
       cursor: pointer;
@@ -462,18 +465,6 @@
       background-color: var(--line-color);
     }
 
-    .tree-category:last-child > .slots-container { border-left: none; }
-    .tree-category:last-child > .slots-container .slot-wrapper::after {
-      content: '';
-      position: absolute;
-      left: -27px;
-      bottom: 50%;
-      width: 4px;
-      height: 100%;
-      background-color: var(--bg-main); 
-      z-index: -1;
-    }
-
     /* Сами слоты */
     .slot {
       background-color: transparent;
@@ -745,8 +736,8 @@
             type: "interactive",
             items: [
               { text: "общеобязательность", desc: "нормы права распространяют свое действие на абсолютно всех субъектов, находящихся на территории государства, независимо от их желания." },
-              { text: "формальная определенность", desc: "правовые нормы всегда зафиксированы в письменном виде в строгих официальных государственных документах – законах, кодексах." },
-              { text: "обеспеченность силой государственного принуждения", desc: "за нарушение правовых норм всегда следует юридическая ответственность и наказание со стороны аппарата принуждения – полиции, суда." },
+              { text: "формальная определенность", desc: "правовые нормы всегда зафиксированы в письменном виде в строгих официальных государственных документах (законах, кодексах)." },
+              { text: "обеспеченность силой государственного принуждения", desc: "за нарушение правовых норм всегда следует юридическая ответственность и наказание со стороны аппарата принуждения (полиции, суда)." },
               { text: "системность и др.", desc: "правовые нормы не существуют изолированно, они логично объединены в институты и отрасли, не противоречащие друг другу." }
             ]
           },
@@ -1218,7 +1209,7 @@
         ]
       },
       {
-        title: "Семейное право и семейные правоотношения",
+        title: "Семейное право",
         titleDesc: "Семейное право – это отрасль права, регулирующая личные неимущественные и имущественные отношения, возникающие из брака, кровного родства и принятия детей на воспитание в семью.",
         categories: [
           { 
@@ -1269,7 +1260,7 @@
         ]
       },
       {
-        title: "Гражданское право и гражданские правоотношения",
+        title: "Гражданское право",
         titleDesc: "Гражданское право – это важнейшая отрасль частного права, регулирующая имущественные и связанные с ними личные неимущественные отношения, основанные на равенстве и независимости сторон.",
         categories: [
           { 
@@ -1364,7 +1355,7 @@
         ]
       },
       {
-        title: "Трудовое право и трудовые правоотношения",
+        title: "Трудовое право",
         titleDesc: "Трудовое право – это отрасль права, регулирующая отношения между работником и работодателем, устанавливающая гарантии прав граждан на труд, справедливую оплату и безопасные условия работы.",
         categories: [
           { 
@@ -1419,7 +1410,7 @@
         ]
       },
       {
-        title: "Уголовное право и уголовная ответственность",
+        title: "Уголовное право",
         titleDesc: "Уголовное право – это самая суровая отрасль права, определяющая, какие общественно опасные деяния являются преступлениями и какие наказания должны применяться к лицам, их совершившим.",
         categories: [
           { 
@@ -1463,7 +1454,7 @@
         ]
       },
       {
-        title: "Административное право и административная ответственность",
+        title: "Административное право",
         titleDesc: "Административное право регулирует общественные отношения в сфере государственного управления, охраны общественного порядка, безопасности и экологии. Административные проступки менее опасны, чем преступления.",
         categories: [
           { 
