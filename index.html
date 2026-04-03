@@ -1,0 +1,2206 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Интеллект-карта – План ЕГЭ</title>
+  <style>
+    /* --- БАЗОВЫЕ ПЕРЕМЕННЫЕ И ТЕМЫ --- */
+    :root {
+      --bg-main: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-splash: #ffffff;
+      --bg-bank: #f1f5f9;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --success: #10b981;
+      --success-bg: #d1fae5;
+      --error: #ef4444;
+      --error-bg: #fee2e2;
+      --border: #e2e8f0;
+      --line-color: #cbd5e1;
+      
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-top: 0 -4px 10px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    [data-theme="dark"] {
+      --bg-main: #0f172a;
+      --bg-surface: #1e293b;
+      --bg-splash: #0f172a;
+      --bg-bank: #0f172a;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #60a5fa;
+      --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.15);
+      --error: #ef4444;
+      --error-bg: rgba(239, 68, 68, 0.15);
+      --border: #334155;
+      --line-color: #475569;
+      
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+      --shadow-top: 0 -4px 10px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.4;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* --- СТАРТОВЫЙ ЭКРАН --- */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      background-color: var(--bg-splash);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 2rem;
+      text-align: center;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #splash-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .splash-icon {
+      width: 80px;
+      height: 80px;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+    .splash-title {
+      font-size: clamp(1.5rem, 6vw, 2.5rem);
+      font-weight: 800;
+      margin-bottom: 1rem;
+      word-break: break-word;
+      hyphens: auto;
+    }
+    .splash-desc {
+      font-size: clamp(0.95rem, 3vw, 1.1rem);
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+      max-width: 500px;
+      line-height: 1.5;
+    }
+    .btn-start {
+      background-color: var(--accent);
+      color: #ffffff;
+      border: none;
+      padding: 1rem 3rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 99px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      animation: pulse 2s infinite;
+      transition: transform 0.2s ease;
+    }
+    .btn-start:active { transform: scale(0.95); }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(37, 99, 235, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+    }
+
+    [data-theme="dark"] .btn-start { animation: pulse-dark 2s infinite; }
+    @keyframes pulse-dark {
+      0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    }
+
+    /* --- ОСНОВНОЙ ИНТЕРФЕЙС --- */
+    #app-ui {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s ease 0.2s, visibility 0.5s ease 0.2s;
+    }
+    #app-ui.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Шапка */
+    .header {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: env(safe-area-inset-top, 15px) 15px 10px;
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      z-index: 10;
+    }
+    .header-title-box {
+      flex: 1;
+      min-width: 0;
+      margin-right: 10px;
+    }
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .header-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .header-controls {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .btn-icon {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+    }
+    .btn-icon:active { transform: scale(0.9); }
+    .btn-blue {
+      background-color: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .btn-blue svg { stroke: #fff; fill: none; }
+    
+    .btn-nav-plan {
+      background-color: var(--accent-soft);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* Инструкция и переключатель режима */
+    .instruction-bar {
+      background-color: var(--accent-soft);
+      color: var(--accent);
+      padding: 10px 15px;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      transition: padding 0.3s ease;
+    }
+    .instruction-bar.compact {
+      padding: 6px 15px;
+      justify-content: center;
+    }
+    
+    .instruction-text {
+      flex: 1;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: left;
+      transition: opacity 0.3s ease, max-height 0.3s ease, margin 0.3s ease;
+      max-height: 50px;
+      overflow: hidden;
+      opacity: 1;
+    }
+    .instruction-text.hidden {
+      display: none; 
+    }
+    
+    .mode-toggle {
+      display: inline-flex;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 99px;
+      padding: 3px;
+      flex-shrink: 0;
+      margin: 0 auto;
+    }
+    [data-theme="dark"] .mode-toggle {
+      background: rgba(0, 0, 0, 0.3);
+    }
+    .mode-btn {
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 99px;
+      cursor: pointer;
+      color: var(--accent);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .mode-btn.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    @media (max-width: 500px) {
+      .instruction-bar:not(.compact) {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+      }
+      .instruction-text {
+        text-align: center;
+      }
+      .mode-toggle {
+        justify-content: center;
+        align-self: center;
+      }
+    }
+
+    /* --- РАБОЧАЯ ЗОНА: ДЕРЕВО ПЛАНА --- */
+    .workspace {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 15px 40px;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+    }
+
+    .tree-root {
+      background-color: var(--text-main);
+      color: var(--bg-surface);
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 800;
+      font-size: 1.1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Кнопки справки (Tooltips) */
+    .info-toggle {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: inherit;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .tree-root .info-toggle { color: var(--bg-surface); }
+    .category-title .info-toggle { background: var(--accent-soft); color: var(--accent); }
+    .slot-content .info-toggle { background: var(--accent-soft); color: var(--accent); margin-left: 10px; }
+    
+    .info-toggle:hover, .info-toggle:active {
+      transform: scale(1.1);
+      background: var(--accent);
+      color: #fff;
+    }
+    .info-toggle svg { width: 16px; height: 16px; }
+
+    /* Панель с текстом справки */
+    .info-panel {
+      display: none;
+      background-color: var(--bg-surface);
+      color: var(--text-main);
+      padding: 14px 20px;
+      font-size: 0.95rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 15px;
+      border-left: 4px solid var(--accent);
+      box-shadow: var(--shadow-lg);
+      animation: fadeInDown 0.2s ease;
+      max-width: 600px;
+      line-height: 1.5;
+    }
+    .info-panel.active { display: block; }
+    .info-panel.root-info { margin-left: 20px; background-color: var(--accent-soft); }
+    .tree-category .info-panel { margin-left: 25px; position: relative; z-index: 2; }
+    .category-title-wrapper .info-panel { margin-left: 0; margin-top: 5px; }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tree-container {
+      position: relative;
+      margin-left: 20px;
+      padding-left: 20px;
+      border-left: 2px solid var(--line-color);
+    }
+
+    .tree-category {
+      position: relative;
+      margin-bottom: 25px;
+    }
+    .tree-category::before {
+      content: '';
+      position: absolute;
+      left: -20px;
+      top: 15px;
+      width: 20px;
+      height: 2px;
+      background-color: var(--line-color);
+    }
+
+    /* Маскировка лишних "хвостов" вертикальных линий */
+    .tree-category:last-child::after {
+      content: '';
+      position: absolute;
+      left: -22px;
+      top: 17px;
+      bottom: -200px;
+      width: 6px;
+      background-color: var(--bg-main);
+    }
+    
+    .slot-wrapper:last-child::after {
+      content: '';
+      position: absolute;
+      left: -27px;
+      top: calc(50% + 1px);
+      bottom: -100px;
+      width: 6px;
+      background-color: var(--bg-main);
+    }
+
+    .category-title {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: var(--text-main);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .category-title-wrapper {
+      position: relative;
+      z-index: 2;
+      margin-bottom: 10px;
+    }
+
+    .slots-container {
+      padding-left: 25px;
+      position: relative;
+      border-left: 2px solid var(--line-color);
+      margin-left: 15px;
+    }
+
+    .slot-wrapper {
+      position: relative;
+      margin-bottom: 8px;
+    }
+    .slot-wrapper::before {
+      content: '';
+      position: absolute;
+      left: -25px;
+      top: 50%;
+      width: 25px;
+      height: 2px;
+      background-color: var(--line-color);
+    }
+
+    .tree-category:last-child > .slots-container { border-left: none; }
+    .tree-category:last-child > .slots-container .slot-wrapper::after {
+      content: '';
+      position: absolute;
+      left: -27px;
+      bottom: 50%;
+      width: 4px;
+      height: 100%;
+      background-color: var(--bg-main); 
+      z-index: -1;
+    }
+
+    /* Сами слоты */
+    .slot {
+      background-color: transparent;
+      border: 2px dashed var(--text-muted);
+      border-radius: var(--radius-sm);
+      padding: 10px 15px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      word-break: break-word;
+      user-select: none;
+    }
+    
+    /* Слот 1-го уровня (для Сложного режима) */
+    .category-slot {
+      background-color: var(--bg-main);
+      border: 2px dashed var(--accent);
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .slot-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .slot.highlight {
+      border-color: var(--accent);
+      background-color: var(--accent-soft);
+      transform: scale(1.02);
+    }
+
+    .slot.filled {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--success);
+      color: var(--text-main);
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+      flex-direction: column;
+      align-items: stretch;
+      padding: 8px 15px;
+    }
+    
+    /* Заполненный слот 1-го уровня визуально маскируется под заголовок */
+    .slot.filled.category-slot-filled {
+      border-left: 1px solid var(--border);
+      background-color: var(--bg-surface);
+      border-radius: var(--radius-md);
+    }
+
+    .slot.error-anim {
+      animation: shake 0.4s ease;
+      background-color: var(--error-bg);
+      border-color: var(--error);
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+
+    /* --- БАНК ТЕРМИНОВ (НИЖНЯЯ ПАНЕЛЬ) --- */
+    .bank-panel {
+      flex-shrink: 0;
+      height: 35vh;
+      min-height: 200px;
+      background-color: var(--bg-bank);
+      border-top: 1px solid var(--border);
+      box-shadow: var(--shadow-top);
+      display: flex;
+      flex-direction: column;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      z-index: 20;
+    }
+
+    .bank-header {
+      padding: 12px 15px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .bank-items {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 10px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .term-item {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .term-item:active { transform: scale(0.95); }
+
+    .term-item.selected {
+      background-color: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .victory-msg {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      color: var(--success);
+      padding: 20px;
+    }
+    .victory-msg svg { width: 48px; height: 48px; margin-bottom: 10px; }
+    .victory-msg h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 15px; }
+    
+    .btn-next-victory {
+      background-color: var(--success);
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 99px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s;
+    }
+    .btn-next-victory:active { transform: scale(0.95); }
+
+  </style>
+</head>
+<body>
+
+  <!-- ИКОНКИ -->
+  <svg style="display: none;" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <symbol id="icon-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="3" y1="9" x2="21" y2="9"></line>
+        <line x1="9" y1="21" x2="9" y2="9"></line>
+      </symbol>
+      <symbol id="icon-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </symbol>
+      <symbol id="icon-sun" viewBox="0 0 24 24"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18.75a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-1.5a.75.75 0 01.75-.75zM6.166 17.834a.75.75 0 00-1.06 1.06l1.59 1.591a.75.75 0 101.06-1.061l-1.59-1.59zM4.5 12a.75.75 0 01-.75.75H1.5a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM6.166 6.166a.75.75 0 001.06-1.06l-1.59-1.59a.75.75 0 00-1.061 1.06l1.59 1.59z"/></symbol>
+      <symbol id="icon-moon" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clip-rule="evenodd"/></symbol>
+      <symbol id="icon-maximize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></symbol>
+      <symbol id="icon-minimize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path></symbol>
+      <symbol id="icon-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+      <symbol id="icon-forward" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></symbol>
+      <symbol id="icon-backward" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></symbol>
+    </defs>
+  </svg>
+
+  <!-- СТАРТОВЫЙ ЭКРАН -->
+  <div id="splash-screen">
+    <svg class="splash-icon"><use href="#icon-map"></use></svg>
+    <h1 class="splash-title">РАЗДЕЛ 5: ПРАВО</h1>
+    <p class="splash-desc">Интеллект-карта. Выберите термин в банке снизу и нажмите на подходящее пустое место в схеме.</p>
+    <button class="btn-start" id="btn-start">Начать изучение</button>
+  </div>
+
+  <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
+  <div id="app-ui">
+    
+    <header class="header">
+      <div class="header-title-box">
+        <div class="header-title">Сборка плана</div>
+        <div class="header-subtitle" id="header-subtitle">Загрузка...</div>
+      </div>
+      <div class="header-controls">
+        <button class="btn-icon btn-nav-plan" id="btn-prev-plan" title="Предыдущий план">
+          <svg><use href="#icon-backward"></use></svg>
+        </button>
+        <button class="btn-icon btn-nav-plan" id="btn-skip-plan" title="Следующий план">
+          <svg><use href="#icon-forward"></use></svg>
+        </button>
+        <button class="btn-icon" id="btn-theme" title="Сменить тему">
+          <svg><use id="icon-theme-use" href="#icon-moon"></use></svg>
+        </button>
+        <button class="btn-icon btn-blue" id="btn-fullscreen" title="На весь экран">
+          <svg><use id="icon-fullscreen-use" href="#icon-maximize"></use></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="instruction-bar" id="instruction-bar">
+      <div class="instruction-text" id="instruction">1. Нажмите на термин внизу. 2. Нажмите на пустой слот.</div>
+      <div class="mode-toggle">
+        <div class="mode-btn active" id="mode-easy">Легко</div>
+        <div class="mode-btn" id="mode-hard">Сложно</div>
+      </div>
+    </div>
+
+    <!-- РАБОЧАЯ ЗОНА: ДЕРЕВО ПЛАНА -->
+    <main class="workspace" id="workspace">
+      <!-- Генерируется динамически -->
+    </main>
+
+    <!-- БАНК ТЕРМИНОВ -->
+    <div class="bank-panel">
+      <div class="bank-header">
+        <span>Банк терминов (<span id="terms-left">0</span>)</span>
+      </div>
+      <div class="bank-items" id="bank-items">
+        <!-- Генерируется динамически -->
+      </div>
+      <div class="victory-msg" id="victory-msg">
+        <svg><use href="#icon-check"></use></svg>
+        <h3>План успешно собран!</h3>
+        <button class="btn-next-victory" id="btn-next-victory">
+          К следующему плану <svg><use href="#icon-forward"></use></svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // --- ЭКСПЕРТНАЯ БАЗА ДАННЫХ ПЛАНОВ: РАЗДЕЛ 5. ПРАВО (23 плана) ---
+    // Строгие правила: среднее тире (–), строчная буква после двоеточия (кроме имен собственных), детальные справки.
+    const allPlans = [
+      {
+        title: "Право как социальный институт",
+        titleDesc: "Право – это система общеобязательных, формально определенных, гарантированных государством норм, регулирующих общественные отношения. Как социальный институт оно поддерживает стабильность и порядок в государстве.",
+        categories: [
+          { 
+            title: "1. Понятие права.", 
+            desc: "Система общеобязательных, формально определенных, гарантированных государством норм, регулирующих общественные отношения.", 
+            type: "static" 
+          },
+          {
+            title: "2. Признаки права:",
+            desc: "Специфические черты, фундаментально отличающие право от других социальных норм (таких как мораль или обычаи).",
+            type: "interactive",
+            items: [
+              { text: "общеобязательность", desc: "нормы права распространяют свое действие на абсолютно всех субъектов, находящихся на территории государства, независимо от их желания." },
+              { text: "формальная определенность", desc: "правовые нормы всегда зафиксированы в письменном виде в строгих официальных государственных документах – законах, кодексах." },
+              { text: "обеспеченность силой государственного принуждения", desc: "за нарушение правовых норм всегда следует юридическая ответственность и наказание со стороны аппарата принуждения – полиции, суда." },
+              { text: "системность и др.", desc: "правовые нормы не существуют изолированно, они логично объединены в институты и отрасли, не противоречащие друг другу." }
+            ]
+          },
+          {
+            title: "3. Принципы права:",
+            desc: "Фундаментальные, базовые идеи и руководящие начала, на которых строится вся правовая система демократического государства.",
+            type: "interactive",
+            items: [
+              { text: "законность", desc: "строгое и неукоснительное соблюдение законов всеми гражданами, организациями и самими органами государственной власти." },
+              { text: "справедливость", desc: "объективная соразмерность между деянием и воздаянием, преступлением и наказанием, защита законных прав каждого человека." },
+              { text: "гуманизм", desc: "признание человека, его жизни, прав и свобод высшей социальной ценностью, категорический запрет на жестокие наказания и пытки." },
+              { text: "равноправие и др.", desc: "абсолютное равенство всех граждан перед законом и судом независимо от пола, расы, национальности, должности или богатства." }
+            ]
+          },
+          {
+            title: "4. Основные отрасли права:",
+            desc: "Крупнейшие структурные подразделения системы права, регулирующие обширные сферы общественных отношений.",
+            type: "interactive",
+            items: [
+              { text: "гражданское", desc: "отрасль, регулирующая имущественные и связанные с ними личные неимущественные отношения." },
+              { text: "уголовное", desc: "отрасль, определяющая, какие общественно опасные деяния являются преступлениями и какие наказания за них назначаются." },
+              { text: "административное и др.", desc: "отрасль, регулирующая отношения в сфере государственного управления и поддержания общественного порядка." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Правовая норма и функции права",
+        titleDesc: "Норма права является первичной «клеточкой» системы права. В совокупности эти нормы выполняют важнейшие функции по регулированию и охране общественных отношений.",
+        categories: [
+          { 
+            title: "1. Понятие нормы права.", 
+            desc: "Общеобязательное, формально определенное правило поведения, установленное и обеспеченное силой государства.", 
+            type: "static" 
+          },
+          {
+            title: "2. Структура правовой нормы:",
+            desc: "Внутреннее логическое строение правовой нормы, традиционно состоящее из трех взаимосвязанных элементов (если – то – иначе).",
+            type: "interactive",
+            items: [
+              { text: "гипотеза", desc: "элемент нормы, указывающий на конкретные жизненные обстоятельства и условия, при которых данная норма начинает действовать (если...)." },
+              { text: "диспозиция", desc: "само правило поведения, указывающее на взаимные права и обязанности субъектов правоотношений (то...)." },
+              { text: "санкция", desc: "элемент нормы, содержащий указание на неблагоприятные последствия (наказание), которые наступят за нарушение этого правила (иначе...)." }
+            ]
+          },
+          {
+            title: "3. Виды правовых норм:",
+            desc: "Классификация правовых норм в зависимости от характера предписываемого ими поведения.",
+            type: "interactive",
+            items: [
+              { text: "обязывающие", desc: "нормы, возлагающие на субъекта обязанность совершить определенные позитивные действия (например, платить налоги)." },
+              { text: "запрещающие", desc: "нормы, требующие воздержаться от совершения определенных опасных или вредных действий (например, запрет на кражу)." },
+              { text: "управомочивающие", desc: "нормы, предоставляющие субъекту право (свободу) совершать определенные действия по своему выбору (например, право владеть имуществом)." }
+            ]
+          },
+          {
+            title: "4. Функции права:",
+            desc: "Основные направления правового воздействия на общественные отношения в государстве.",
+            type: "interactive",
+            items: [
+              { text: "регулятивная", desc: "упорядочивание общественных отношений, установление четких и понятных правил поведения для всех субъектов." },
+              { text: "охранительная", desc: "защита важнейших общественных отношений от противоправных посягательств, пресечение и наказание правонарушений." },
+              { text: "воспитательная", desc: "формирование у граждан уважения к закону и правовой культуры путем стимулирования правомерного поведения." },
+              { text: "оценочная и др.", desc: "право выступает объективным критерием (мерилом) для оценки поступков людей как правомерных или неправомерных." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Источники (формы) права",
+        titleDesc: "Источник (форма) права – это официально закрепленные формы внешнего выражения содержания права, в которых содержатся нормы права и которые придают им общеобязательное значение.",
+        categories: [
+          { 
+            title: "1. Понятие источника права.", 
+            desc: "Официально закрепленные формы внешнего выражения содержания права, обязательные для исполнения всеми субъектами.", 
+            type: "static" 
+          },
+          {
+            title: "2. Основные источники права:",
+            desc: "Исторически сложившиеся способы закрепления правовых норм в различных правовых системах мира.",
+            type: "interactive",
+            items: [
+              { text: "нормативный правовой акт", desc: "официальный документ, принятый компетентным государственным органом (закон, указ), содержащий нормы права (основной источник в РФ)." },
+              { text: "правовой обычай", desc: "исторически сложившееся и вошедшее в привычку правило поведения, которому государство придало общеобязательную силу." },
+              { text: "судебный (административный) прецедент", desc: "решение суда по конкретному делу, которое становится обязательным правилом для решения аналогичных дел в будущем (характерно для США и Англии)." },
+              { text: "нормативный договор и др.", desc: "соглашение двух или более субъектов (например, государств), устанавливающее для них взаимные права и обязанности." }
+            ]
+          },
+          {
+            title: "3. Особенности нормативного правового акта (НПА):",
+            desc: "Специфические черты основного источника права в Российской Федерации.",
+            type: "interactive",
+            items: [
+              { text: "издается компетентными государственными органами", desc: "НПА принимаются строго определенными структурами (Парламентом, Президентом, Правительством) в пределах их полномочий." },
+              { text: "имеет официальную письменную форму", desc: "всегда оформляется в виде строгих юридических документов (кодексов, федеральных законов, указов) с четкой структурой." },
+              { text: "обладает строгой юридической силой и др.", desc: "любой НПА занимает определенное место в иерархии законов и обязателен к исполнению на всей территории, на которую распространяется." }
+            ]
+          },
+          {
+            title: "4. Иерархия нормативных правовых актов в РФ:",
+            desc: "Система соподчинения правовых актов по их юридической силе, где нижестоящие акты не могут противоречить вышестоящим.",
+            type: "interactive",
+            items: [
+              { text: "Конституция РФ", desc: "Основной закон государства, обладающий высшей юридической силой, прямым действием и верховенством на всей территории страны." },
+              { text: "федеральные конституционные законы и федеральные законы", desc: "акты высшей юридической силы (после Конституции), принимаемые Парламентом по важнейшим вопросам жизни общества." },
+              { text: "законы субъектов РФ", desc: "нормативные акты (конституции, уставы, законы), принимаемые региональными парламентами и действующие только на их территории." },
+              { text: "подзаконные акты", desc: "акты, издаваемые на основе и во исполнение законов: указы Президента, постановления Правительства, приказы министерств." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Законотворческий процесс в РФ",
+        titleDesc: "Законотворческий процесс – это сложная, строго регламентированная Конституцией деятельность высших органов государственной власти по разработке, принятию и официальному опубликованию законов.",
+        categories: [
+          { 
+            title: "1. Понятие законотворческого процесса.", 
+            desc: "Строго регламентированная процедура разработки, рассмотрения, принятия и обнародования законов компетентными государственными органами.", 
+            type: "static" 
+          },
+          {
+            title: "2. Принципы законотворчества:",
+            desc: "Фундаментальные правила, на которых базируется процесс создания законов в демократическом обществе.",
+            type: "interactive",
+            items: [
+              { text: "демократизм", desc: "участие общества в создании законов через избранных представителей (депутатов) и открытые общественные обсуждения." },
+              { text: "законность", desc: "весь процесс разработки и принятия новых правовых актов должен строго соответствовать Конституции и регламенту." },
+              { text: "научная обоснованность и др.", desc: "законы должны опираться на объективные данные социологии, экономики и проходить криминологическую экспертизу." }
+            ]
+          },
+          {
+            title: "3. Субъекты права законодательной инициативы в РФ:",
+            desc: "Органы и должностные лица, имеющие конституционное право официально вносить проекты новых законов в Государственную Думу.",
+            type: "interactive",
+            items: [
+              { text: "Президент РФ", desc: "глава государства обладает правом предлагать Парламенту любые законопроекты, в том числе приоритетные." },
+              { text: "Совет Федерации РФ и его сенаторы", desc: "верхняя палата парламента и каждый сенатор лично имеют право вносить законопроекты." },
+              { text: "Государственная Дума РФ и ее депутаты", desc: "нижняя палата и каждый депутат лично могут инициировать рассмотрение нового закона." },
+              { text: "Правительство РФ и др.", desc: "высший орган исполнительной власти вносит проекты законов, особенно касающиеся федерального бюджета и налогов." }
+            ]
+          },
+          {
+            title: "4. Стадии законотворческого процесса в РФ:",
+            desc: "Обязательные этапы прохождения законопроекта от момента его внесения до вступления в законную силу.",
+            type: "interactive",
+            items: [
+              { text: "внесение законопроекта в Государственную Думу РФ", desc: "стадия законодательной инициативы, на которой проект официально регистрируется в нижней палате парламента." },
+              { text: "обсуждение и принятие закона Государственной Думой РФ", desc: "законопроект проходит три чтения, обсуждается, в него вносятся поправки, и он принимается большинством голосов депутатов." },
+              { text: "одобрение закона Советом Федерации РФ", desc: "принятый Думой закон в течение 5 дней передается в верхнюю палату, которая должна его рассмотреть и одобрить." },
+              { text: "подписание и обнародование закона Президентом РФ", desc: "завершающая стадия: Президент подписывает закон, после чего он официально публикуется и вступает в силу." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Правоотношения и их структура",
+        titleDesc: "Правоотношения – это урегулированные нормами права общественные отношения, участники которых имеют взаимные субъективные права и юридические обязанности.",
+        categories: [
+          { 
+            title: "1. Понятие правоотношений.", 
+            desc: "Общественные отношения, урегулированные нормами права, участники которых наделены взаимными правами и юридическими обязанностями.", 
+            type: "static" 
+          },
+          {
+            title: "2. Структура правоотношений:",
+            desc: "Обязательные элементы, без которых правоотношение не может существовать.",
+            type: "interactive",
+            items: [
+              { text: "субъекты", desc: "участники правоотношения, наделенные правосубъектностью (правоспособностью и дееспособностью)." },
+              { text: "объекты", desc: "материальные и нематериальные блага, по поводу которых субъекты вступают в правоотношения (вещи, услуги, авторские права)." },
+              { text: "содержание (субъективные права и юридические обязанности)", desc: "мера возможного (права) и должного (обязанности) поведения участников правоотношения." }
+            ]
+          },
+          {
+            title: "3. Субъекты правоотношений:",
+            desc: "Лица и организации, выступающие полноправными участниками правового общения.",
+            type: "interactive",
+            items: [
+              { text: "физические лица", desc: "граждане Российской Федерации, иностранные граждане и лица без гражданства (апатриды)." },
+              { text: "юридические лица", desc: "зарегистрированные организации (коммерческие фирмы, некоммерческие фонды), имеющие обособленное имущество." },
+              { text: "публично-правовые образования (государство, муниципальные образования и др.)", desc: "Российская Федерация, ее субъекты (области, республики) и города, выступающие в суде или договорах." }
+            ]
+          },
+          {
+            title: "4. Юридические факты как основания возникновения правоотношений:",
+            desc: "Конкретные жизненные обстоятельства, с которыми нормы права связывают возникновение, изменение или прекращение правоотношений.",
+            type: "interactive",
+            items: [
+              { text: "события (не зависят от воли людей)", desc: "юридические факты, происходящие объективно, независимо от воли и сознания людей (например, стихийное бедствие, истечение сроков, естественная смерть человека)." },
+              { text: "действия (правомерные и неправомерные)", desc: "юридические факты, совершаемые по воле людей (правомерные – заключение договора; неправомерные – совершение кражи)." }
+            ]
+          },
+          {
+            title: "5. Виды правоотношений по отраслевой принадлежности:",
+            desc: "Классификация правоотношений в зависимости от того, какой отраслью права они регулируются.",
+            type: "interactive",
+            items: [
+              { text: "гражданские", desc: "отношения, связанные с имуществом, договорами, наследованием и защитой чести и достоинства." },
+              { text: "семейные", desc: "отношения, возникающие из факта брака, кровного родства или усыновления детей." },
+              { text: "административные и др.", desc: "отношения, возникающие в сфере государственного управления и взаимодействия граждан с органами власти (например, уплата штрафа)." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Юридическая ответственность",
+        titleDesc: "Юридическая ответственность – это применение мер государственного принуждения к виновному лицу за совершенное правонарушение. Она является важнейшим инструментом поддержания правопорядка.",
+        categories: [
+          { 
+            title: "1. Понятие юридической ответственности.", 
+            desc: "Применение мер государственного принуждения к правонарушителю за совершенное им противоправное деяние.", 
+            type: "static" 
+          },
+          {
+            title: "2. Признаки юридической ответственности:",
+            desc: "Специфические черты, отличающие юридическую ответственность от моральной или политической.",
+            type: "interactive",
+            items: [
+              { text: "наступает только за совершенное правонарушение", desc: "нельзя наказать человека за его мысли, намерения или внешний вид, наказывается только конкретное противоправное деяние." },
+              { text: "устанавливается и применяется государством", desc: "меры ответственности могут применять только уполномоченные государственные органы (суд, полиция) в строгом процессуальном порядке." },
+              { text: "влечет неблагоприятные последствия для правонарушителя и др.", desc: "правонарушитель обязан претерпеть лишения личного (арест), имущественного (штраф) или организационного (увольнение) характера." }
+            ]
+          },
+          {
+            title: "3. Функции юридической ответственности:",
+            desc: "Цели, ради достижения которых государство наказывает правонарушителей.",
+            type: "interactive",
+            items: [
+              { text: "карательная", desc: "справедливое возмездие государства: наказание правонарушителя за причиненный обществу вред." },
+              { text: "превентивная (предупредительная)", desc: "наказание одного лица служит уроком для других, предупреждая совершение новых правонарушений (как самим нарушителем, так и окружающими)." },
+              { text: "правовосстановительная (компенсационная)", desc: "возмещение причиненного материального или морального вреда потерпевшему (например, взыскание долга)." },
+              { text: "воспитательная", desc: "перевоспитание правонарушителя, формирование у него уважительного отношения к закону и обществу." }
+            ]
+          },
+          {
+            title: "4. Виды юридической ответственности:",
+            desc: "Классификация ответственности в зависимости от отрасли права, нормы которой были нарушены.",
+            type: "interactive",
+            items: [
+              { text: "уголовная", desc: "самый суровый вид ответственности, наступает исключительно за совершение преступлений и налагается только судом." },
+              { text: "административная", desc: "наступает за совершение административных проступков (нарушение ПДД, мелкое хулиганство), налагается полицией или судом." },
+              { text: "гражданско-правовая", desc: "наступает за нарушение имущественных и личных неимущественных прав (неуплата долга, нарушение договора), носит компенсационный характер." },
+              { text: "дисциплинарная", desc: "наступает за нарушение трудовой, учебной или служебной дисциплины (прогул, опоздание), налагается работодателем." },
+              { text: "материальная", desc: "обязанность работника возместить ущерб, причиненный имуществу работодателя в процессе трудовой деятельности." }
+            ]
+          },
+          {
+            title: "5. Обстоятельства, исключающие юридическую ответственность:",
+            desc: "Установленные законом ситуации, при которых деяние внешне похоже на правонарушение, но не признается таковым.",
+            type: "interactive",
+            items: [
+              { text: "необходимая оборона", desc: "правомерная защита личности и прав обороняющегося от общественно опасного посягательства с причинением вреда нападающему." },
+              { text: "крайняя необходимость", desc: "причинение вреда для устранения опасности, непосредственно угрожающей личности, если этот вред меньше предотвращенного (например, разбить чужое окно при пожаре)." },
+              { text: "невменяемость и др.", desc: "состояние, при котором лицо во время деяния не могло осознавать характер своих действий из-за психического расстройства." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Система права",
+        titleDesc: "Система права – это внутреннее строение права, выражающееся в единстве и согласованности действующих в государстве правовых норм и одновременном разделении права на относительно самостоятельные части (отрасли и институты).",
+        categories: [
+          { 
+            title: "1. Понятие системы права.", 
+            desc: "Внутренняя структура права, представляющая собой согласованное единство правовых норм и их деление на отрасли и институты.", 
+            type: "static" 
+          },
+          {
+            title: "2. Элементы системы права:",
+            desc: "Структурные единицы, из которых, словно из кирпичиков, складывается всё право государства.",
+            type: "interactive",
+            items: [
+              { text: "норма права", desc: "первичный, базовый элемент системы права: конкретное общеобязательное правило поведения." },
+              { text: "институт права", desc: "обособленный комплекс правовых норм, регулирующий определенный вид однородных общественных отношений (например, институт гражданства или институт брака)." },
+              { text: "отрасль права", desc: "самая крупная часть системы: совокупность норм, регулирующая целую сферу общественных отношений (гражданское, уголовное право)." }
+            ]
+          },
+          {
+            title: "3. Основные отрасли российского права:",
+            desc: "Глобальные сферы правового регулирования в Российской Федерации.",
+            type: "interactive",
+            items: [
+              { text: "конституционное право", desc: "ведущая отрасль, закрепляющая основы государственного строя, статус личности и систему органов власти." },
+              { text: "гражданское право", desc: "отрасль, регулирующая имущественные и связанные с ними личные неимущественные отношения (собственность, договоры)." },
+              { text: "административное право", desc: "отрасль, регулирующая отношения в сфере государственного управления и поддержания общественного порядка." },
+              { text: "уголовное право и др.", desc: "отрасль, определяющая, какие общественно опасные деяния являются преступлениями и какие наказания за них назначаются." }
+            ]
+          },
+          {
+            title: "4. Деление системы права:",
+            desc: "Фундаментальные классификации всех отраслей права в юриспруденции.",
+            type: "interactive",
+            items: [
+              { text: "частное и публичное право", desc: "частное право (гражданское, семейное) защищает интересы частных лиц на основе их равенства; публичное (уголовное, административное) защищает интересы государства на основе подчинения." },
+              { text: "материальное и процессуальное право", desc: "материальное прямо регулирует отношения (кто прав, кто виноват); процессуальное устанавливает строгий порядок защиты этих прав в суде (судопроизводство)." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Конституция РФ в системе нормативно-правовых актов",
+        titleDesc: "Конституция РФ – это Основной закон государства, обладающий высшей юридической силой и устанавливающий основы конституционного строя, права и свободы человека и гражданина, устройство государства.",
+        categories: [
+          { 
+            title: "1. Понятие Конституции РФ.", 
+            desc: "Основной закон Российской Федерации, обладающий высшей юридической силой и закрепляющий основы конституционного строя и статус личности.", 
+            type: "static" 
+          },
+          {
+            title: "2. Юридические свойства Конституции РФ:",
+            desc: "Уникальные черты, которые выделяют Конституцию среди всех остальных законов страны.",
+            type: "interactive",
+            items: [
+              { text: "высшая юридическая сила", desc: "ни один федеральный или региональный закон, указ Президента или иной акт не может противоречить нормам Конституции РФ." },
+              { text: "прямое действие", desc: "нормы Конституции применяются непосредственно судами: гражданин может защищать свои права, ссылаясь прямо на статьи Конституции." },
+              { text: "особый усложненный порядок внесения поправок", desc: "Конституцию нельзя изменить простым голосованием в Думе, для этого требуются сложные процедуры, а иногда и всенародный референдум." },
+              { text: "верховенство в правовой системе и др.", desc: "Конституция является ядром всей правовой системы государства, базой для текущего нормотворчества." }
+            ]
+          },
+          {
+            title: "3. Функции Конституции РФ:",
+            desc: "Важнейшая политическая и правовая роль Основного закона в жизни страны.",
+            type: "interactive",
+            items: [
+              { text: "правовая (юридическая)", desc: "Конституция выступает фундаментом для всей системы права, инициируя принятие новых законов и кодексов." },
+              { text: "учредительная", desc: "Конституция учреждает (создает) само государство, форму его правления, государственные символы и высшие органы власти." },
+              { text: "идеологическая", desc: "Конституция закрепляет базовые ценности общества: демократию, права человека, патриотизм и социальное равенство." },
+              { text: "политическая и др.", desc: "Конституция задает жесткие правила политической борьбы, не позволяя ни одной партии или человеку узурпировать власть." }
+            ]
+          },
+          {
+            title: "4. Структура Конституции РФ:",
+            desc: "Внутреннее строение текста Основного закона страны.",
+            type: "interactive",
+            items: [
+              { text: "преамбула", desc: "вступительная часть, в которой провозглашаются высшие ценности, цели и мотивы принятия Конституции многонациональным народом." },
+              { text: "раздел первый", desc: "основная часть документа, состоящая из 9 глав, закрепляющих основы строя, права граждан и полномочия государственных органов." },
+              { text: "раздел второй (заключительные и переходные положения)", desc: "раздел, определяющий порядок вступления Конституции в силу и механизм перехода от старого законодательства к новому." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Основы конституционного строя РФ",
+        titleDesc: "Конституционный строй – это система основополагающих базовых общественных отношений, устанавливающих принципы организации государственной власти и отношения между государством и личностью.",
+        categories: [
+          { 
+            title: "1. Понятие конституционного строя.", 
+            desc: "Система базовых общественных отношений, определяющих принципы организации государства, общества и статус личности в РФ.", 
+            type: "static" 
+          },
+          {
+            title: "2. РФ как демократическое федеративное правовое государство:",
+            desc: "Главные политико-правовые характеристики российского государства, закрепленные в статье 1 Конституции РФ.",
+            type: "interactive",
+            items: [
+              { text: "республиканская форма правления", desc: "высшие органы государственной власти (Президент, Парламент) избираются народом на строго определенный срок, власть не передается по наследству." },
+              { text: "народ – единственный источник власти", desc: "суверенитет народа: граждане осуществляют свою власть непосредственно (референдумы, выборы) и через государственные органы." },
+              { text: "федерализм и равноправие субъектов РФ", desc: "государство состоит из равноправных республик, краев и областей, обладающих политической автономией вне ведения центра." },
+              { text: "верховенство права и разделение властей", desc: "закон един для всех, а государственная власть разделена на законодательную, исполнительную и судебную ветви." }
+            ]
+          },
+          {
+            title: "3. Социально-экономические основы строя РФ:",
+            desc: "Фундаментальные принципы устройства экономики и социальной сферы в России.",
+            type: "interactive",
+            items: [
+              { text: "свобода экономической деятельности", desc: "в России гарантируются единое экономическое пространство, свободное перемещение товаров, услуг и капиталов, поддержка конкуренции." },
+              { text: "признание и защита равным образом частной, государственной, муниципальной и иных форм собственности", desc: "все формы собственности (и бизнесмена, и государства) абсолютно равны перед законом и одинаково защищаются судом." },
+              { text: "политика государства направлена на создание условий, обеспечивающих достойную жизнь и свободное развитие человека (социальное государство)", desc: "Россия обязуется охранять труд, устанавливать МРОТ, платить пенсии и поддерживать материнство и инвалидов." }
+            ]
+          },
+          {
+            title: "4. Идеологические и политические основы:",
+            desc: "Принципы духовной и политической свободы в Российской Федерации.",
+            type: "interactive",
+            items: [
+              { text: "идеологическое многообразие", desc: "в РФ признается идеологическое многообразие; никакая идеология не может устанавливаться в качестве государственной или обязательной." },
+              { text: "политический плюрализм и многопартийность", desc: "свобода создания оппозиционных партий, равенство общественных объединений перед законом." },
+              { text: "светский характер государства", desc: "никакая религия не может устанавливаться в качестве государственной, церковь отделена от государства." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Правовой статус гражданина РФ",
+        titleDesc: "Правовой статус гражданина – это законодательно закрепленная совокупность прав, свобод и обязанностей человека, определяющая его положение в государстве и обществе.",
+        categories: [
+          { 
+            title: "1. Понятие правового статуса человека и гражданина.", 
+            desc: "Совокупность конституционных прав, свобод и юридических обязанностей, определяющих положение личности в государстве.", 
+            type: "static" 
+          },
+          {
+            title: "2. Группы конституционных прав и свобод:",
+            desc: "Классификация естественных и позитивных прав человека по сферам их реализации.",
+            type: "interactive",
+            items: [
+              { text: "личные (гражданские)", desc: "неотъемлемые права, присущие человеку от рождения: право на жизнь, свободу, личную неприкосновенность и тайну переписки." },
+              { text: "политические", desc: "права, обеспечивающие участие граждан в управлении страной: право избирать, право на митинги, свобода слова." },
+              { text: "социально-экономические", desc: "права, обеспечивающие достойный уровень жизни: право на частную собственность, свободу труда, отдых и пенсию." },
+              { text: "культурные", desc: "права, гарантирующие духовное развитие: право на образование, свободу творчества и доступ к культурным ценностям." }
+            ]
+          },
+          {
+            title: "3. Конституционные обязанности гражданина РФ:",
+            desc: "Жесткие юридические требования, предъявляемые государством к поведению своих граждан.",
+            type: "interactive",
+            items: [
+              { text: "соблюдение Конституции и законов РФ", desc: "базовая, универсальная обязанность абсолютно всех лиц (включая иностранцев), находящихся на территории России." },
+              { text: "защита Отечества", desc: "долг и обязанность гражданина РФ, реализуемая через прохождение военной или альтернативной гражданской службы." },
+              { text: "уплата законно установленных налогов и сборов", desc: "важнейшая экономическая обязанность, обеспечивающая наполнение государственного бюджета." },
+              { text: "сохранение природы и окружающей среды и др.", desc: "обязанность бережно относиться к природным богатствам, растительному и животному миру России." }
+            ]
+          },
+          {
+            title: "4. Конституционные гарантии прав и свобод:",
+            desc: "Механизмы, с помощью которых государство реально обеспечивает защиту прав человека.",
+            type: "interactive",
+            items: [
+              { text: "государственная защита прав и свобод", desc: "Российская Федерация берет на себя прямую обязанность гарантировать и защищать права каждого гражданина." },
+              { text: "право на судебную защиту", desc: "каждый гражданин вправе обратиться в суд для восстановления своих нарушенных прав и обжалования незаконных действий чиновников." },
+              { text: "право на получение квалифицированной юридической помощи и др.", desc: "каждому гарантируется право на адвоката, а в случаях, предусмотренных законом, эта помощь оказывается бесплатно." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Воинская обязанность и альтернативная гражданская служба в РФ",
+        titleDesc: "Защита Отечества – это долг и обязанность гражданина РФ. Гражданин несет военную службу, но если его убеждения противоречат этому, он имеет право на альтернативную гражданскую службу (АГС).",
+        categories: [
+          { 
+            title: "1. Понятие воинской обязанности.", 
+            desc: "Установленный законом долг граждан РФ нести военную службу в рядах Вооруженных Сил и защищать Отечество.", 
+            type: "static" 
+          },
+          {
+            title: "2. Этапы осуществления воинской обязанности в РФ:",
+            desc: "Последовательность действий гражданина (мужчины) во взаимоотношениях с военкоматом.",
+            type: "interactive",
+            items: [
+              { text: "воинский учет", desc: "первоначальная постановка юношей на учет в военном комиссариате по месту жительства (в год достижения 17 лет)." },
+              { text: "обязательная подготовка к военной службе", desc: "получение базовых знаний по ОБЖ в школе и военно-учетных специальностей." },
+              { text: "призыв на военную службу", desc: "официальное решение призывной комиссии о направлении годного гражданина (от 18 лет) в войска." },
+              { text: "прохождение военной службы по призыву", desc: "непосредственное несение службы в Вооруженных Силах РФ в течение установленного законом срока (1 год)." },
+              { text: "пребывание в запасе", desc: "зачисление уволенных в запас граждан в мобилизационный резерв Вооруженных Сил на случай масштабной войны." }
+            ]
+          },
+          {
+            title: "3. Основания для освобождения от призыва на военную службу:",
+            desc: "Законные причины, по которым гражданин навсегда освобождается от военной службы по призыву.",
+            type: "interactive",
+            items: [
+              { text: "признание не годным или ограниченно годным по состоянию здоровья", desc: "освобождение по медицинским показаниям после прохождения военно-врачебной комиссии." },
+              { text: "прохождение военной службы в другом государстве", desc: "освобождение для лиц, уже отслуживших в армии государства, с которым у РФ заключен соответствующий договор." },
+              { text: "прохождение альтернативной гражданской службы и др.", desc: "полное прохождение АГС приравнивается к исполнению воинского долга и освобождает от военной службы." }
+            ]
+          },
+          {
+            title: "4. Основания для замены военной службы по призыву на АГС:",
+            desc: "Конституционные причины, по которым гражданин имеет законное право отказаться брать в руки оружие.",
+            type: "interactive",
+            items: [
+              { text: "несение военной службы противоречит убеждениям призывника", desc: "наличие у гражданина глубоких пацифистских (антивоенных) философских или моральных взглядов." },
+              { text: "несение военной службы противоречит вероисповеданию призывника", desc: "принадлежность гражданина к религиозной конфессии, строго запрещающей брать в руки оружие и служить в армии." },
+              { text: "принадлежность к коренному малочисленному народу, ведение традиционного образа жизни и традиционной хозяйственной деятельности", desc: "право малых народов Севера, Сибири и Дальнего Востока на замену военной службы работой в традиционных промыслах (оленеводство)." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Семейное право и семейные правоотношения",
+        titleDesc: "Семейное право – это отрасль права, регулирующая личные неимущественные и имущественные отношения, возникающие из брака, кровного родства и принятия детей на воспитание в семью.",
+        categories: [
+          { 
+            title: "1. Понятие семейного права.", 
+            desc: "Отрасль права, регулирующая личные и имущественные отношения между гражданами, возникающие из брака и принадлежности к семье.", 
+            type: "static" 
+          },
+          {
+            title: "2. Принципы правового регулирования семейных отношений:",
+            desc: "Фундаментальные основы Семейного кодекса РФ.",
+            type: "interactive",
+            items: [
+              { text: "добровольность брачного союза", desc: "брак является свободным союзом, недопустимо принуждение мужчины или женщины к вступлению в брак." },
+              { text: "равенство прав супругов в семье", desc: "муж и жена имеют абсолютно равные права в решении вопросов материнства, отцовства и воспитания детей." },
+              { text: "разрешение внутрисемейных вопросов по взаимному согласию", desc: "все споры в семье должны решаться не путем диктата одного из супругов, а через диалог и компромисс." },
+              { text: "приоритет семейного воспитания детей и др.", desc: "государство признает, что лучшей средой для воспитания и развития ребенка является его родная семья." }
+            ]
+          },
+          {
+            title: "3. Условия заключения брака:",
+            desc: "Требования закона, без соблюдения которых ЗАГС не зарегистрирует брак.",
+            type: "interactive",
+            items: [
+              { text: "взаимное добровольное согласие мужчины и женщины", desc: "будущие супруги должны выразить свою свободную волю лично присутствуя в ЗАГСе." },
+              { text: "достижение брачного возраста (по общему правилу – 18 лет)", desc: "закон устанавливает возраст совершеннолетия, но при уважительных причинах он может быть снижен." },
+              { text: "отсутствие обстоятельств, препятствующих заключению брака", desc: "недопустимость юридических или медицинских преград для создания семьи." }
+            ]
+          },
+          {
+            title: "4. Обстоятельства, препятствующие заключению брака:",
+            desc: "Ситуации, при которых брак в РФ категорически запрещен.",
+            type: "interactive",
+            items: [
+              { text: "наличие другого зарегистрированного брака", desc: "запрет полигамии (многоженства/многомужества): нельзя вступить в новый брак, не расторгнув предыдущий." },
+              { text: "близкое родство", desc: "запрет браков между прямыми родственниками (братьями/сестрами, родителями/детьми) во избежание генетических аномалий." },
+              { text: "признание лица судом недееспособным вследствие психического расстройства и др.", desc: "запрет на брак с лицами, которые не могут осознавать характер своих действий и руководить ими." }
+            ]
+          },
+          {
+            title: "5. Имущественные права супругов:",
+            desc: "Два правовых режима владения имуществом в браке.",
+            type: "interactive",
+            items: [
+              { text: "режим совместной собственности (законный режим)", desc: "всё имущество (и доходы), нажитое в браке, считается общим и при разводе делится строго пополам (50/50)." },
+              { text: "режим договорной собственности (брачный договор)", desc: "супруги заранее, добровольно и нотариально определяют, кому и какое имущество достанется в браке и в случае развода." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Гражданское право и гражданские правоотношения",
+        titleDesc: "Гражданское право – это важнейшая отрасль частного права, регулирующая имущественные и связанные с ними личные неимущественные отношения, основанные на равенстве и независимости сторон.",
+        categories: [
+          { 
+            title: "1. Понятие гражданского права.", 
+            desc: "Отрасль частного права, регулирующая имущественные и личные неимущественные отношения, основанные на равенстве и автономии воли сторон.", 
+            type: "static" 
+          },
+          {
+            title: "2. Принципы гражданского права:",
+            desc: "Фундаментальные основы рыночной экономики, закрепленные в Гражданском кодексе РФ.",
+            type: "interactive",
+            items: [
+              { text: "равенство участников отношений", desc: "государство, крупная корпорация и обычный гражданин абсолютно равны при заключении гражданских договоров." },
+              { text: "неприкосновенность собственности", desc: "никто не может быть произвольно лишен своего имущества иначе как по решению независимого суда." },
+              { text: "свобода договора", desc: "граждане и фирмы свободны в заключении договоров и сами определяют любые условия, если они не нарушают закон." },
+              { text: "недопустимость произвольного вмешательства в частные дела и др.", desc: "запрет государству и чиновникам без законных оснований вмешиваться в коммерческую деятельность бизнеса." }
+            ]
+          },
+          {
+            title: "3. Субъекты гражданского права:",
+            desc: "Лица и организации, наделенные гражданской правоспособностью и дееспособностью.",
+            type: "interactive",
+            items: [
+              { text: "физические лица", desc: "все граждане РФ, иностранцы и апатриды, выступающие в роли покупателей, арендаторов или собственников." },
+              { text: "юридические лица", desc: "зарегистрированные коммерческие и некоммерческие организации, имеющие собственное имущество и печать." },
+              { text: "публично-правовые образования", desc: "Российская Федерация, регионы и муниципалитеты, выступающие равноправными участниками гражданских сделок." }
+            ]
+          },
+          {
+            title: "4. Объекты гражданских прав:",
+            desc: "Блага, по поводу которых возникают гражданские правоотношения.",
+            type: "interactive",
+            items: [
+              { text: "вещи (включая наличные деньги и документарные ценные бумаги)", desc: "материальные предметы, недвижимость, автомобили, деньги, являющиеся объектами купли-продажи." },
+              { text: "результаты интеллектуальной деятельности", desc: "авторские права, патенты, изобретения, картины и литературные произведения." },
+              { text: "нематериальные блага и др.", desc: "жизнь, здоровье, деловая репутация, честь и достоинство личности, защищаемые законом." }
+            ]
+          },
+          {
+            title: "5. Организационно-правовые формы коммерческих юридических лиц:",
+            desc: "Виды компаний, создаваемых исключительно ради извлечения прибыли.",
+            type: "interactive",
+            items: [
+              { text: "хозяйственные товарищества и общества", desc: "самые распространенные формы бизнеса (ООО, АО, полные товарищества), объединяющие капиталы учредителей." },
+              { text: "крестьянские (фермерские) хозяйства", desc: "добровольные объединения граждан для совместной сельскохозяйственной деятельности." },
+              { text: "производственные кооперативы", desc: "добровольные объединения граждан (артели) для совместного труда, где каждый обязан работать лично." },
+              { text: "государственные и муниципальные унитарные предприятия", desc: "коммерческие предприятия, не наделенные правом собственности на закрепленное за ними государственное имущество (ГУП, МУП)." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Права потребителей в РФ",
+        titleDesc: "Закон «О защите прав потребителей» гарантирует гражданам безопасность товаров, право на получение достоверной информации и возмещение убытков при покупке некачественной продукции.",
+        categories: [
+          { 
+            title: "1. Понятие потребителя.", 
+            desc: "Гражданин, имеющий намерение заказать или приобрести товары (услуги) исключительно для личных, семейных, домашних нужд, не связанных с бизнесом.", 
+            type: "static" 
+          },
+          {
+            title: "2. Основные права потребителей:",
+            desc: "Законные гарантии, защищающие обычного гражданина от недобросовестных продавцов и корпораций.",
+            type: "interactive",
+            items: [
+              { text: "право на качество товаров (работ, услуг)", desc: "продавец обязан передать потребителю товар, полностью соответствующий договору и пригодный для использования." },
+              { text: "право на безопасность товаров (работ, услуг)", desc: "гарантия того, что товар при обычных условиях использования не причинит вреда жизни, здоровью и имуществу потребителя." },
+              { text: "право на информацию об изготовителе и о товаре", desc: "право получить полную, достоверную русскоязычную информацию о составе товара, сроке годности и производителе." },
+              { text: "право на возмещение ущерба и др.", desc: "право требовать полного возмещения финансовых убытков и морального вреда, причиненных некачественным товаром." }
+            ]
+          },
+          {
+            title: "3. Обязанности продавца (изготовителя, исполнителя):",
+            desc: "Требования закона, которые бизнес обязан неукоснительно соблюдать по отношению к клиенту.",
+            type: "interactive",
+            items: [
+              { text: "передать товар надлежащего качества", desc: "продавец не имеет права продавать бракованные или испорченные вещи под видом новых и исправных." },
+              { text: "предоставить достоверную информацию о товаре", desc: "обязанность честно указывать реальный состав, страну производства, срок службы и противопоказания на упаковке." },
+              { text: "соблюдать установленные сроки оказания услуг и др.", desc: "обязанность вовремя доставить мебель или выполнить ремонт согласно датам, прописанным в договоре." }
+            ]
+          },
+          {
+            title: "4. Способы защиты прав потребителей:",
+            desc: "Механизмы восстановления нарушенных прав обманутого покупателя.",
+            type: "interactive",
+            items: [
+              { text: "досудебный (претензионный) порядок", desc: "направление письменной претензии непосредственно продавцу с требованием вернуть деньги или заменить бракованный товар." },
+              { text: "судебная защита", desc: "подача искового заявления в суд на продавца (от уплаты госпошлины по таким делам потребители освобождены)." },
+              { text: "обращение в органы государственного надзора (Роспотребнадзор) и др.", desc: "жалоба в профильный государственный орган, который может оштрафовать магазин или закрыть его." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Трудовое право и трудовые правоотношения",
+        titleDesc: "Трудовое право – это отрасль права, регулирующая отношения между работником и работодателем, устанавливающая гарантии прав граждан на труд, справедливую оплату и безопасные условия работы.",
+        categories: [
+          { 
+            title: "1. Понятие трудового права.", 
+            desc: "Отрасль права, регулирующая отношения, основанные на наемном труде, а также связанные с ним отношения по социальному партнерству.", 
+            type: "static" 
+          },
+          {
+            title: "2. Принципы трудового права:",
+            desc: "Фундаментальные основы Трудового кодекса РФ, защищающие работника.",
+            type: "interactive",
+            items: [
+              { text: "свобода труда", desc: "каждый имеет право свободно распоряжаться своими способностями к труду, выбирать профессию и род деятельности." },
+              { text: "запрещение принудительного труда", desc: "категорический запрет заставлять человека работать под угрозой наказания или насилия." },
+              { text: "равенство прав и возможностей работников", desc: "запрет любой дискриминации в сфере труда по признакам пола, расы, религии или политических убеждений." },
+              { text: "право на своевременную и в полном размере выплату справедливой заработной платы и др.", desc: "гарантия выплаты зарплаты не ниже установленного федерального МРОТ и строго в установленные дни." }
+            ]
+          },
+          {
+            title: "3. Обязательные условия трудового договора:",
+            desc: "Пункты, без которых трудовой договор считается недействительным.",
+            type: "interactive",
+            items: [
+              { text: "место работы", desc: "указание конкретной организации и ее фактического местонахождения, где сотрудник будет трудиться." },
+              { text: "трудовая функция", desc: "четкое определение должности, специальности и конкретного вида поручаемой сотруднику работы." },
+              { text: "условия оплаты труда", desc: "размер тарифной ставки или оклада работника, а также доплаты, надбавки и поощрительные выплаты." },
+              { text: "режим рабочего времени и времени отдыха и др.", desc: "указание часов работы, времени обеденного перерыва и выходных дней." }
+            ]
+          },
+          {
+            title: "4. Основания прекращения трудового договора:",
+            desc: "Законные причины увольнения сотрудника с работы.",
+            type: "interactive",
+            items: [
+              { text: "по инициативе работника", desc: "добровольное увольнение (по собственному желанию) с обязательным предупреждением за две недели." },
+              { text: "по соглашению сторон", desc: "самый мирный способ расторжения договора в любой момент времени по обоюдной договоренности." },
+              { text: "по инициативе работодателя", desc: "увольнение из-за сокращения штата, ликвидации фирмы или за грубые нарушения (прогул, пьянство)." },
+              { text: "по обстоятельствам, не зависящим от воли сторон", desc: "прекращение договора из-за призыва в армию, стихийного бедствия или смерти работника." }
+            ]
+          },
+          {
+            title: "5. Особенности регулирования труда несовершеннолетних:",
+            desc: "Особые льготы и гарантии, защищающие здоровье подростков (до 18 лет) на работе.",
+            type: "interactive",
+            items: [
+              { text: "обязательный предварительный медицинский осмотр", desc: "подросток принимается на работу только после прохождения медосмотра за счет работодателя." },
+              { text: "запрет на работу в ночное время и сверхурочно", desc: "несовершеннолетних категорически нельзя привлекать к работе ночью (с 22 до 6 часов) и в выходные." },
+              { text: "сокращенная продолжительность рабочего времени", desc: "подростки работают меньше взрослых (например, до 16 лет – не более 24 часов в неделю), но получают зарплату с учетом сокращенного времени." },
+              { text: "запрет на применение труда на работах с вредными условиями и др.", desc: "несовершеннолетним нельзя работать под землей, в опасных цехах, а также в барах и казино." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Уголовное право и уголовная ответственность",
+        titleDesc: "Уголовное право – это самая суровая отрасль права, определяющая, какие общественно опасные деяния являются преступлениями и какие наказания должны применяться к лицам, их совершившим.",
+        categories: [
+          { 
+            title: "1. Понятие уголовного права.", 
+            desc: "Отрасль публичного права, регулирующая отношения, связанные с совершением преступлений и назначением за них наказаний.", 
+            type: "static" 
+          },
+          {
+            title: "2. Понятие и признаки преступления:",
+            desc: "Характеристики самого тяжкого вида правонарушений, закрепленные в Уголовном кодексе РФ.",
+            type: "interactive",
+            items: [
+              { text: "общественная опасность", desc: "деяние причиняет существенный, серьезный вред личности, обществу или государству (или создает угрозу такого вреда)." },
+              { text: "противоправность", desc: "деяние прямо запрещено статьями Уголовного кодекса РФ под угрозой наказания." },
+              { text: "виновность", desc: "деяние совершено осознанно, при наличии вины человека в форме прямого умысла или грубой неосторожности." },
+              { text: "наказуемость", desc: "за совершение данного деяния Уголовным кодексом предусмотрено конкретное, суровое уголовное наказание." }
+            ]
+          },
+          {
+            title: "3. Виды уголовных наказаний:",
+            desc: "Меры государственного принуждения, назначаемые исключительно по приговору суда.",
+            type: "interactive",
+            items: [
+              { text: "штраф", desc: "денежное взыскание в крупных размерах, назначаемое судом в качестве основного или дополнительного наказания." },
+              { text: "обязательные работы", desc: "выполнение осужденным в свободное от основной работы время бесплатных общественно полезных работ." },
+              { text: "исправительные работы", desc: "работы по месту службы или в местах, определяемых органами, с удержанием части зарплаты в доход государства." },
+              { text: "лишение свободы на определенный срок и др.", desc: "изоляция осужденного от общества путем направления его в колонию поселения, общего или строгого режима." }
+            ]
+          },
+          {
+            title: "4. Обстоятельства, исключающие преступность деяния:",
+            desc: "Уникальные ситуации, при которых деяние внешне похоже на преступление, но из-за своей полезности или вынужденности не наказывается.",
+            type: "interactive",
+            items: [
+              { text: "необходимая оборона", desc: "правомерное причинение вреда нападающему преступнику в целях защиты своей жизни или жизни других лиц." },
+              { text: "крайняя необходимость", desc: "причинение вреда чужому имуществу для спасения жизней при катастрофах (если этот вред меньше предотвращенного)." },
+              { text: "физическое или психическое принуждение", desc: "человек не подлежит ответственности, если совершил преступление под непреодолимыми пытками или угрозой смерти." },
+              { text: "исполнение приказа или распоряжения и др.", desc: "причинение вреда лицом, действующим во исполнение обязательного для него приказа начальника (например, в армии)." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Административное право и административная ответственность",
+        titleDesc: "Административное право регулирует общественные отношения в сфере государственного управления, охраны общественного порядка, безопасности и экологии. Административные проступки менее опасны, чем преступления.",
+        categories: [
+          { 
+            title: "1. Понятие административного права.", 
+            desc: "Отрасль права, регулирующая общественные отношения в сфере управленческой деятельности государственных органов и должностных лиц.", 
+            type: "static" 
+          },
+          {
+            title: "2. Признаки административного правонарушения (проступка):",
+            desc: "Черты деяния, нарушающего порядок управления, за которое предусмотрена административная ответственность.",
+            type: "interactive",
+            items: [
+              { text: "деяние (действие или бездействие)", desc: "акт волевого поведения: активное действие (переход на красный свет) или пассивное бездействие (неуплата штрафа)." },
+              { text: "противоправность", desc: "деяние прямо нарушает нормы Кодекса об административных правонарушениях (КоАП РФ)." },
+              { text: "виновность", desc: "наличие вины лица: осознание им противоправности своих действий." },
+              { text: "административная наказуемость", desc: "за совершение деяния в КоАП РФ предусмотрено конкретное административное наказание." }
+            ]
+          },
+          {
+            title: "3. Виды административных наказаний:",
+            desc: "Меры ответственности, применяемые полицией, инспекциями или судом.",
+            type: "interactive",
+            items: [
+              { text: "предупреждение", desc: "самая мягкая мера: официальное письменное порицание физического или юридического лица." },
+              { text: "административный штраф", desc: "денежное взыскание, выражающееся в уплате определенной суммы в бюджет (самое частое наказание)." },
+              { text: "лишение специального права", desc: "временное изъятие ранее предоставленного права (например, лишение водительских прав за пьянство за рулем)." },
+              { text: "административный арест и др.", desc: "самая суровая мера в КоАП: изоляция нарушителя от общества на срок до 15 суток (применяется только судом)." }
+            ]
+          },
+          {
+            title: "4. Субъекты административной ответственности:",
+            desc: "Лица и организации, которых можно оштрафовать или арестовать по КоАП РФ.",
+            type: "interactive",
+            items: [
+              { text: "граждане (достигшие 16 лет)", desc: "физические лица, совершившие проступок после достижения возраста 16 лет." },
+              { text: "должностные лица", desc: "директора, чиновники, несущие повышенную ответственность за невыполнение своих служебных обязанностей." },
+              { text: "юридические лица", desc: "коммерческие фирмы и заводы (их могут оштрафовать на гигантские суммы за нарушение экологии или правил торговли)." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Гражданский процесс",
+        titleDesc: "Гражданский процесс (судопроизводство) – это урегулированная нормами процессуального права деятельность суда и участвующих в деле лиц по рассмотрению и разрешению гражданских, семейных и трудовых споров.",
+        categories: [
+          { 
+            title: "1. Понятие гражданского судопроизводства.", 
+            desc: "Установленный законом порядок рассмотрения и разрешения судами гражданских дел (имущественных, семейных, трудовых споров).", 
+            type: "static" 
+          },
+          {
+            title: "2. Основные принципы гражданского процесса:",
+            desc: "Фундаментальные, демократические правила проведения честного суда.",
+            type: "interactive",
+            items: [
+              { text: "осуществление правосудия только судом", desc: "никакие другие органы (полиция, чиновники) не имеют права выносить решения и разрешать гражданские споры." },
+              { text: "равенство всех перед законом и судом", desc: "суд обязан одинаково беспристрастно относиться к богатой корпорации и обычному бедному гражданину." },
+              { text: "состязательность и равноправие сторон", desc: "истец и ответчик имеют абсолютно равные права в споре, они сами должны активно доказывать свою правоту, а суд выступает лишь независимым арбитром." },
+              { text: "гласность судебного разбирательства и др.", desc: "разбирательство дел во всех судах является открытым, на нем могут присутствовать журналисты и зрители (за исключением секретных дел)." }
+            ]
+          },
+          {
+            title: "3. Участники (стороны) гражданского процесса:",
+            desc: "Главные действующие лица любого гражданского спора.",
+            type: "interactive",
+            items: [
+              { text: "истец", desc: "лицо, чьи права были нарушены, и которое подало исковое заявление в суд для их защиты." },
+              { text: "ответчик", desc: "лицо, которое привлекается судом к ответу в связи с предположением о том, что оно нарушило права истца." }
+            ]
+          },
+          {
+            title: "4. Права сторон в гражданском процессе:",
+            desc: "Широкие процессуальные возможности, предоставленные истцу и ответчику для защиты своих интересов.",
+            type: "interactive",
+            items: [
+              { text: "знакомиться с материалами дела", desc: "право читать все документы, экспертизы и протоколы, находящиеся в судебном деле." },
+              { text: "заявлять ходатайства", desc: "право официально просить суд о совершении процессуальных действий (например, о вызове нового свидетеля)." },
+              { text: "представлять доказательства", desc: "право приносить в суд документы, чеки, видеозаписи и привлекать экспертов, подтверждающих правоту стороны." },
+              { text: "обжаловать судебные постановления и др.", desc: "право подать апелляцию в вышестоящий суд, если сторона не согласна с вынесенным решением." }
+            ]
+          },
+          {
+            title: "5. Стадии гражданского процесса:",
+            desc: "Порядок движения гражданского дела в суде первой инстанции.",
+            type: "interactive",
+            items: [
+              { text: "возбуждение производства по делу", desc: "стадия, начинающаяся с момента подачи искового заявления в суд и принятия его судьей." },
+              { text: "подготовка дела к судебному разбирательству", desc: "судья опрашивает стороны, запрашивает дополнительные доказательства и определяет круг свидетелей." },
+              { text: "судебное разбирательство и др.", desc: "главная стадия: рассмотрение дела по существу, прения сторон в зале суда и вынесение судебного решения." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Уголовный процесс",
+        titleDesc: "Уголовный процесс (судопроизводство) – это основанная на законе деятельность правоохранительных органов и суда по расследованию преступлений, изобличению виновных и назначению им справедливого наказания.",
+        categories: [
+          { 
+            title: "1. Понятие уголовного судопроизводства.", 
+            desc: "Регламентированная законом деятельность органов дознания, следствия, прокуратуры и суда по расследованию уголовных дел и разрешению их в суде.", 
+            type: "static" 
+          },
+          {
+            title: "2. Участники уголовного процесса со стороны обвинения:",
+            desc: "Лица, задача которых – найти, доказать вину и наказать преступника.",
+            type: "interactive",
+            items: [
+              { text: "прокурор", desc: "главное должностное лицо со стороны обвинения, поддерживающее государственное обвинение в суде против преступника." },
+              { text: "следователь", desc: "сотрудник правоохранительных органов, производящий предварительное следствие (сбор улик, допросы) по сложным делам." },
+              { text: "дознаватель", desc: "сотрудник полиции, производящий упрощенное предварительное расследование (дознание) по преступлениям небольшой тяжести." },
+              { text: "потерпевший и др.", desc: "лицо (человек или фирма), которому преступлением причинен физический, имущественный или моральный вред." }
+            ]
+          },
+          {
+            title: "3. Участники уголовного процесса со стороны защиты:",
+            desc: "Лица, задача которых – защитить подозреваемого от незаконного обвинения и добиться справедливости.",
+            type: "interactive",
+            items: [
+              { text: "подозреваемый", desc: "лицо, в отношении которого возбуждено уголовное дело или которое задержано по подозрению в преступлении." },
+              { text: "обвиняемый", desc: "лицо, в отношении которого вынесено официальное постановление о привлечении в качестве обвиняемого." },
+              { text: "защитник и др.", desc: "лицо (обычно профессиональный адвокат), осуществляющее юридическую защиту прав подозреваемого или обвиняемого." }
+            ]
+          },
+          {
+            title: "4. Меры пресечения в уголовном процессе:",
+            desc: "Принудительные меры, применяемые к обвиняемому, чтобы он не сбежал и не помешал следствию.",
+            type: "interactive",
+            items: [
+              { text: "подписка о невыезде", desc: "письменное обязательство обвиняемого не покидать свое место жительства без разрешения следователя." },
+              { text: "залог", desc: "внесение крупной суммы денег на счет суда в качестве гарантии того, что обвиняемый не скроется от следствия." },
+              { text: "домашний арест", desc: "запрет обвиняемому покидать свое жилье, общаться с определенными лицами и пользоваться интернетом." },
+              { text: "заключение под стражу и др.", desc: "самая строгая мера (назначается только судом): изоляция обвиняемого в СИЗО на время расследования." }
+            ]
+          },
+          {
+            title: "5. Стадии уголовного процесса:",
+            desc: "Строгая процессуальная цепочка действий от момента совершения преступления до отправки в колонию.",
+            type: "interactive",
+            items: [
+              { text: "возбуждение уголовного дела", desc: "начальная стадия: принятие решения о начале расследования на основе заявления или обнаружения трупа." },
+              { text: "предварительное расследование", desc: "основная стадия работы полиции: поиск улик, допрос свидетелей, проведение экспертиз и поиск преступника." },
+              { text: "судебное разбирательство", desc: "открытое состязание прокурора и адвоката в суде, допрос свидетелей перед судьей и вынесение приговора." },
+              { text: "исполнение приговора и др.", desc: "финальная стадия: вступление приговора в законную силу и отправка осужденного в колонию." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Институт гражданства в РФ",
+        titleDesc: "Гражданство – это устойчивая политико-правовая связь человека с государством, выражающаяся в совокупности их взаимных прав, обязанностей и ответственности.",
+        categories: [
+          { 
+            title: "1. Понятие гражданства.", 
+            desc: "Устойчивая политико-правовая связь лица с Российской Федерацией, выражающаяся в совокупности их взаимных прав и обязанностей.", 
+            type: "static" 
+          },
+          {
+            title: "2. Принципы гражданства в РФ:",
+            desc: "Фундаментальные, гуманистические основы института гражданства, закрепленные в Конституции России.",
+            type: "interactive",
+            items: [
+              { text: "является единым и равным независимо от оснований приобретения", desc: "права гражданина, родившегося в РФ, абсолютно равны правам мигранта, получившего паспорт РФ только вчера." },
+              { text: "гражданин РФ не может быть лишен своего гражданства или права изменить его", desc: "государство не может принудительно аннулировать паспорт гражданина РФ по рождению ни за какие преступления." },
+              { text: "проживание гражданина за пределами РФ не прекращает его гражданства", desc: "гражданин может жить за границей десятилетиями, но он всё равно остается гражданином России." },
+              { text: "гражданин РФ не может быть выслан за пределы РФ или выдан иностранному государству и др.", desc: "государство защищает своих граждан: Россия никогда не выдаст своего гражданина для суда в другую страну." }
+            ]
+          },
+          {
+            title: "3. Основания приобретения гражданства РФ:",
+            desc: "Законные способы получения паспорта гражданина России.",
+            type: "interactive",
+            items: [
+              { text: "по рождению (филиация)", desc: "основной способ: если хотя бы один из родителей имеет гражданство РФ, ребенок автоматически становится россиянином." },
+              { text: "в результате приема в гражданство (натурализация)", desc: "процедура получения гражданства иностранцем после выполнения ряда строгих государственных условий." },
+              { text: "в результате восстановления в гражданстве", desc: "процедура возвращения гражданства лицам, которые ранее от него добровольно отказались, но решили вернуться." },
+              { text: "по иным основаниям (оптация и др.)", desc: "оптация – массовый выбор гражданства при изменении государственных границ (например, присоединение новых территорий)." }
+            ]
+          },
+          {
+            title: "4. Общие условия приема в гражданство РФ для иностранных граждан:",
+            desc: "Жесткий фильтр (цензы) для мигрантов, желающих стать россиянами (общий порядок).",
+            type: "interactive",
+            items: [
+              { text: "постоянное проживание на территории РФ со дня получения вида на жительство в течение 5 лет", desc: "ценз оседлости: иностранец должен легально и долго жить в стране, чтобы доказать свою благонадежность." },
+              { text: "наличие законного источника средств к существованию", desc: "претендент должен иметь легальную работу и зарплату, чтобы не стать обузой для социальной системы государства." },
+              { text: "обязательство соблюдать Конституцию и законодательство РФ", desc: "официальная клятва (присяга) уважать законы, культуру и традиции Российской Федерации." },
+              { text: "владение русским языком", desc: "обязательная сдача экзамена на знание государственного языка для успешной интеграции в общество." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Правоохранительные органы РФ",
+        titleDesc: "Правоохранительные органы – это обособленная группа государственных органов, призванная осуществлять защиту прав и свобод граждан, общества и государства, а также вести борьбу с преступностью.",
+        categories: [
+          { 
+            title: "1. Понятие правоохранительных органов.", 
+            desc: "Группа государственных органов, наделенных специальными полномочиями для защиты правопорядка, прав граждан и борьбы с преступностью.", 
+            type: "static" 
+          },
+          {
+            title: "2. Основные правоохранительные органы в РФ:",
+            desc: "Ключевые силовые и надзорные структуры государства.",
+            type: "interactive",
+            items: [
+              { text: "органы внутренних дел (полиция)", desc: "самый массовый орган: охраняет общественный порядок на улицах, ловит преступников и контролирует ПДД." },
+              { text: "прокуратура", desc: "единая федеральная система органов, осуществляющая надзор за точным соблюдением законов всеми министерствами и полицией." },
+              { text: "Следственный комитет", desc: "элитный правоохранительный орган, расследующий самые тяжкие, сложные и резонансные уголовные дела (убийства, коррупцию)." },
+              { text: "Федеральная служба безопасности (ФСБ) и др.", desc: "спецслужба, обеспечивающая национальную безопасность, занимающаяся контрразведкой, защитой границ и борьбой с терроризмом." }
+            ]
+          },
+          {
+            title: "3. Функции правоохранительных органов:",
+            desc: "Главные задачи силовиков в демократическом обществе.",
+            type: "interactive",
+            items: [
+              { text: "охрана государственного и общественного строя", desc: "пресечение попыток вооруженных мятежей, терактов и государственных переворотов." },
+              { text: "защита прав и свобод человека и гражданина", desc: "защита жизни, здоровья и собственности обычных людей от посягательств бандитов." },
+              { text: "борьба с преступностью", desc: "поиск преступников, проведение арестов, раскрытие сложных схем мошенничества и наркоторговли." },
+              { text: "обеспечение законности и правопорядка и др.", desc: "патрулирование улиц, недопущение массовых беспорядков и пьяных драк в общественных местах." }
+            ]
+          },
+          {
+            title: "4. Функции прокуратуры РФ:",
+            desc: "Уникальные надзорные полномочия, делающие прокуратуру «оком государевым».",
+            type: "interactive",
+            items: [
+              { text: "надзор за исполнением законов", desc: "прокурор следит за тем, чтобы мэры, министры и сами полицейские не нарушали права граждан и Конституцию." },
+              { text: "координация деятельности правоохранительных органов по борьбе с преступностью", desc: "прокуратура объединяет и направляет усилия МВД, ФСБ и Следкома в борьбе с мафией." },
+              { text: "участие в рассмотрении дел судами (поддержание государственного обвинения) и др.", desc: "в суде именно прокурор выступает от имени государства, доказывая вину убийцы или вора." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Судебная система РФ",
+        titleDesc: "Судебная система – это совокупность всех судов, действующих в РФ, осуществляющих правосудие и гарантирующих защиту прав и свобод граждан.",
+        categories: [
+          { 
+            title: "1. Понятие судебной системы.", 
+            desc: "Совокупность всех судов, действующих на территории РФ, построенная на единых принципах и осуществляющая правосудие.", 
+            type: "static" 
+          },
+          {
+            title: "2. Структура судебной системы РФ:",
+            desc: "Иерархия судов, от самых мелких до высших.",
+            type: "interactive",
+            items: [
+              { text: "Конституционный Суд РФ", desc: "высший судебный орган конституционного контроля, проверяющий соответствие законов Основному закону страны." },
+              { text: "Верховный Суд РФ, суды общей юрисдикции и арбитражные суды (федеральные суды)", desc: "суды общей юрисдикции судят граждан и бандитов; арбитражные суды разрешают экономические споры между фирмами; Верховный Суд возглавляет их." },
+              { text: "мировые судьи (суды субъектов РФ)", desc: "самый низший и массовый уровень судов: они быстро рассматривают мелкие бытовые ссоры, разводы и небольшие кражи." }
+            ]
+          },
+          {
+            title: "3. Основные принципы судопроизводства в РФ:",
+            desc: "Конституционные основы честного правосудия.",
+            type: "interactive",
+            items: [
+              { text: "осуществление правосудия только судом", desc: "никто, кроме независимого судьи, не может вынести приговор и назвать человека преступником." },
+              { text: "независимость судей", desc: "судьи подчиняются только Конституции и закону; никто не имеет права звонить судье и указывать, какое решение принять." },
+              { text: "гласность", desc: "открытость судебных заседаний: на суд могут прийти журналисты и любые граждане, тайные суды запрещены." },
+              { text: "состязательность и равноправие сторон и др.", desc: "прокурор и адвокат имеют абсолютно равные права в суде; судья лишь слушает их аргументы и выносит решение." }
+            ]
+          },
+          {
+            title: "4. Полномочия Конституционного Суда РФ:",
+            desc: "Особые, исключительные права высшего суда страны.",
+            type: "interactive",
+            items: [
+              { text: "разрешение дел о соответствии Конституции РФ федеральных законов, нормативных актов Президента РФ и др.", desc: "если Госдума примет антиконституционный закон, Конституционный Суд может его отменить." },
+              { text: "разрешение споров о компетенции между органами государственной власти", desc: "выступает арбитром, если, например, Президент и Парламент спорят, кто из них имеет право издать определенный указ." },
+              { text: "толкование Конституции РФ и др.", desc: "только этот суд имеет официальное право объяснять, что именно означает та или иная сложная статья Конституции." }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Международное право",
+        titleDesc: "Международное право – это система юридических принципов и норм, регулирующих отношения между государствами и международными организациями. Особое место в нем занимает международное гуманитарное право (законы войны).",
+        categories: [
+          { 
+            title: "1. Понятие международного права.", 
+            desc: "Особая система юридических принципов и норм, регулирующих отношения между государствами и международными организациями.", 
+            type: "static" 
+          },
+          {
+            title: "2. Основные отрасли международного права:",
+            desc: "Глобальные сферы межгосударственного регулирования.",
+            type: "interactive",
+            items: [
+              { text: "международное гуманитарное право (МГП)", desc: "система норм, применяемых в период вооруженных конфликтов (войн) для защиты мирного населения и военнопленных." },
+              { text: "международное экологическое право", desc: "договоры государств о совместной борьбе с глобальным потеплением, защите океанов и озонового слоя." },
+              { text: "международное экономическое право", desc: "правила глобальной торговли и движения капиталов, устанавливаемые ВТО и другими организациями." },
+              { text: "международное уголовное право и др.", desc: "отрасль, преследующая международных террористов, пиратов и организаторов геноцида через Интерпол и международные трибуналы." }
+            ]
+          },
+          {
+            title: "3. Важнейшие принципы международного права:",
+            desc: "Базовые, незыблемые правила ООН, обеспечивающие мир на планете.",
+            type: "interactive",
+            items: [
+              { text: "суверенное равенство государств", desc: "огромные США или Китай юридически абсолютно равны крошечным странам; у каждого государства есть один голос в ООН." },
+              { text: "неприменение силы или угрозы силой", desc: "категорический запрет на развязывание агрессивных войн; война признается международным преступлением." },
+              { text: "нерушимость государственных границ", desc: "запрет на насильственный захват чужих территорий; границы могут меняться только по мирному договору." },
+              { text: "мирное разрешение международных споров и др.", desc: "государства обязаны решать все конфликты за столом переговоров или в Международном суде, а не на поле боя." }
+            ]
+          },
+          {
+            title: "4. Международное гуманитарное право:",
+            desc: "«Законы войны» (Женевские конвенции), ограничивающие жестокость даже во время боевых действий.",
+            type: "interactive",
+            items: [
+              { text: "правила ведения военных действий (запрет на использование определенных видов оружия и др.)", desc: "строгий запрет на применение химического, биологического (бактериологического) оружия и ядов, вызывающих чрезмерные страдания." },
+              { text: "защита жертв войны (раненых, военнопленных)", desc: "пленных солдат запрещено пытать, убивать или унижать; раненых врагов обязаны лечить так же, как своих." },
+              { text: "защита гражданского населения и др.", desc: "категорический запрет на бомбардировки мирных городов, жилых домов, больниц и уничтожение запасов воды и пищи." }
+            ]
+          }
+        ]
+      }
+    ];
+
+    // --- ЛОГИКА ИНТЕРФЕЙСА ---
+    const htmlEl = document.documentElement;
+    const splashScreen = document.getElementById('splash-screen');
+    const appUi = document.getElementById('app-ui');
+    const btnStart = document.getElementById('btn-start');
+    const btnTheme = document.getElementById('btn-theme');
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    
+    // Кнопки навигации
+    const btnSkipPlan = document.getElementById('btn-skip-plan');
+    const btnPrevPlan = document.getElementById('btn-prev-plan');
+    const btnNextVictory = document.getElementById('btn-next-victory');
+    
+    const workspaceContainer = document.getElementById('workspace');
+    const bankContainer = document.getElementById('bank-items');
+    const termsLeftEl = document.getElementById('terms-left');
+    const victoryMsg = document.getElementById('victory-msg');
+    const instruction = document.getElementById('instruction');
+    const subtitleEl = document.getElementById('header-subtitle');
+
+    let currentTheme = 'light';
+    let currentMode = 'easy'; // 'easy' - только подпункты, 'hard' - 1 и 2 уровень
+    let currentPlanIndex = 0;
+    let bankTerms = [];
+    let selectedTermId = null;
+    let audioCtx = null;
+    let hasInteracted = false;
+
+    // Аудио движок (Приятный "Дзинь")
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playSuccessSound() {
+      if (!audioCtx) return;
+      try {
+        const playBell = (freq, delay) => {
+          const osc = audioCtx.createOscillator();
+          const gainNode = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          
+          gainNode.gain.setValueAtTime(0, audioCtx.currentTime + delay);
+          gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + delay + 0.02);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + 0.6);
+          
+          osc.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          
+          osc.start(audioCtx.currentTime + delay);
+          osc.stop(audioCtx.currentTime + delay + 0.6);
+        };
+        
+        playBell(1046.50, 0); // Нота C6
+        playBell(1318.51, 0); // Нота E6
+      } catch(e) { console.warn("Audio error", e); }
+    }
+
+    window.toggleInfo = function(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('active');
+    };
+
+    // Переключение режимов
+    document.getElementById('mode-easy').addEventListener('click', () => {
+       if (currentMode === 'easy') return;
+       currentMode = 'easy';
+       document.getElementById('mode-easy').classList.add('active');
+       document.getElementById('mode-hard').classList.remove('active');
+       loadPlan(currentPlanIndex);
+    });
+
+    document.getElementById('mode-hard').addEventListener('click', () => {
+       if (currentMode === 'hard') return;
+       currentMode = 'hard';
+       document.getElementById('mode-hard').classList.add('active');
+       document.getElementById('mode-easy').classList.remove('active');
+       loadPlan(currentPlanIndex);
+    });
+
+    // --- ГЕНЕРАЦИЯ ПЛАНА ---
+    function loadPlan(index) {
+      const plan = allPlans[index];
+      
+      subtitleEl.textContent = `План ${index + 1} из ${allPlans.length}: ${plan.title}`;
+      
+      let wsHTML = `
+        <div class="tree-root">
+          ${plan.title}
+          <button class="info-toggle" onclick="toggleInfo('info-main')" title="Что это?">
+            <svg><use href="#icon-info"></use></svg>
+          </button>
+        </div>
+        <div class="info-panel root-info" id="info-main">${plan.titleDesc}</div>
+        <div class="tree-container">
+      `;
+
+      bankTerms = [];
+      let termIdCounter = 1; // Защита от бага нуля
+
+      plan.categories.forEach((cat, catIndex) => {
+        const catId = `cat-${index}-${catIndex}`;
+        const catRootId = `root-${index}-${catIndex}`;
+        
+        wsHTML += `<div class="tree-category">`;
+
+        // В сложном режиме ВСЕ пункты первого уровня становятся слотами
+        if (currentMode === 'hard') {
+            let cleanTitle = cat.title.replace(/^\d+\.\s*/, '').replace(/[:.]$/, '');
+            // Переводим первую букву в строчную
+            cleanTitle = cleanTitle.charAt(0).toLowerCase() + cleanTitle.slice(1);
+            
+            const tId = termIdCounter++;
+            
+            bankTerms.push({
+                id: tId,
+                cat: catRootId,
+                text: cleanTitle,
+                desc: cat.desc || '',
+                fullTitle: cat.title,
+                isLevel1: true
+            });
+            
+            wsHTML += `
+              <div class="category-title-wrapper">
+                <div class="slot category-slot" data-cat="${catRootId}" data-filled="false">Пункт 1 уровня</div>
+              </div>
+            `;
+        } else {
+            // В легком режиме пункты 1 уровня отображаются статично
+            wsHTML += `
+              <div class="category-title">
+                ${cat.title}
+                ${cat.desc ? `<button class="info-toggle" onclick="toggleInfo('info-${catId}')" title="Справка"><svg><use href="#icon-info"></use></svg></button>` : ''}
+              </div>
+              ${cat.desc ? `<div class="info-panel" id="info-${catId}">${cat.desc}</div>` : ''}
+            `;
+        }
+
+        // Подпункты всегда генерируются как слоты (если они есть)
+        if (cat.type === 'interactive' && cat.items) {
+          wsHTML += `<div class="slots-container">`;
+          cat.items.forEach(item => {
+            const tId = termIdCounter++;
+            bankTerms.push({
+              id: tId,
+              cat: catId,
+              text: item.text,
+              desc: item.desc,
+              isLevel1: false
+            });
+            wsHTML += `
+              <div class="slot-wrapper">
+                <div class="slot" data-cat="${catId}" data-filled="false">Подпункт</div>
+              </div>
+            `;
+          });
+          wsHTML += `</div>`;
+        }
+        wsHTML += `</div>`;
+      });
+
+      wsHTML += `</div>`;
+      workspaceContainer.innerHTML = wsHTML;
+
+      // Перемешиваем банк
+      bankTerms.sort(() => Math.random() - 0.5);
+      
+      // Сброс UI (Инструкция остается скрытой, если пользователь уже взаимодействовал)
+      selectedTermId = null;
+      victoryMsg.style.display = 'none';
+      bankContainer.style.display = 'flex';
+
+      renderBank();
+      bindSlotEvents();
+    }
+
+    // Навигация по планам
+    function loadNextPlan() {
+      currentPlanIndex = (currentPlanIndex + 1) % allPlans.length;
+      loadPlan(currentPlanIndex);
+    }
+    
+    function loadPrevPlan() {
+      currentPlanIndex = (currentPlanIndex - 1 + allPlans.length) % allPlans.length;
+      loadPlan(currentPlanIndex);
+    }
+
+    btnSkipPlan.addEventListener('click', () => {
+      initAudio();
+      loadNextPlan();
+    });
+
+    btnPrevPlan.addEventListener('click', () => {
+      initAudio();
+      loadPrevPlan();
+    });
+
+    btnNextVictory.addEventListener('click', () => {
+      loadNextPlan();
+    });
+
+    // --- ЛОГИКА ИГРЫ ---
+    function renderBank() {
+      bankContainer.innerHTML = '';
+      termsLeftEl.textContent = bankTerms.length;
+
+      if (bankTerms.length === 0) {
+        bankContainer.style.display = 'none';
+        victoryMsg.style.display = 'flex';
+        return;
+      }
+
+      bankTerms.forEach(term => {
+        const div = document.createElement('div');
+        div.className = `term-item ${selectedTermId === term.id ? 'selected' : ''}`;
+        div.textContent = term.text;
+        div.dataset.id = term.id;
+        div.addEventListener('click', () => selectTerm(term.id));
+        bankContainer.appendChild(div);
+      });
+    }
+
+    function selectTerm(id) {
+      if (!hasInteracted) {
+        hasInteracted = true;
+        document.getElementById('instruction').classList.add('hidden');
+        document.getElementById('instruction-bar').classList.add('compact');
+      }
+
+      if (selectedTermId === id) {
+        selectedTermId = null;
+      } else {
+        selectedTermId = id;
+      }
+      
+      renderBank();
+      
+      const slots = document.querySelectorAll('.slot');
+      slots.forEach(slot => {
+        if (slot.dataset.filled === "false") {
+          slot.classList.toggle('highlight', selectedTermId !== null);
+        }
+      });
+    }
+
+    function bindSlotEvents() {
+      const slots = document.querySelectorAll('.slot');
+      slots.forEach(slot => {
+        slot.addEventListener('click', () => {
+          if (!hasInteracted) {
+            hasInteracted = true;
+            document.getElementById('instruction').classList.add('hidden');
+            document.getElementById('instruction-bar').classList.add('compact');
+          }
+
+          // Возврат в банк
+          if (slot.dataset.filled === "true") {
+            const returnedTerm = {
+              id: parseInt(slot.dataset.termId),
+              cat: slot.dataset.cat,
+              text: slot.dataset.originalText,
+              desc: slot.dataset.desc,
+              fullTitle: slot.dataset.fullTitle,
+              isLevel1: slot.dataset.isLevel1 === "true"
+            };
+            bankTerms.push(returnedTerm);
+            
+            slot.dataset.filled = "false";
+            slot.dataset.termId = "";
+            slot.dataset.desc = "";
+            slot.dataset.originalText = "";
+            slot.dataset.fullTitle = "";
+            slot.dataset.isLevel1 = "";
+            
+            const isLevel1Slot = slot.classList.contains('category-slot');
+            slot.textContent = isLevel1Slot ? "Пункт 1 уровня" : "Подпункт";
+            slot.className = isLevel1Slot ? "slot category-slot" : "slot"; 
+            
+            const panel = slot.parentNode.querySelector('.info-panel');
+            if (panel) panel.remove();
+            
+            renderBank();
+            if(navigator.vibrate) navigator.vibrate(20);
+            return;
+          }
+
+          if (selectedTermId === null) return;
+
+          const termObj = bankTerms.find(t => t.id === selectedTermId);
+          
+          if (slot.dataset.cat === termObj.cat) {
+            // УСПЕХ
+            slot.dataset.originalText = termObj.text;
+            slot.dataset.fullTitle = termObj.fullTitle || "";
+            slot.dataset.isLevel1 = termObj.isLevel1 || false;
+            
+            if (termObj.isLevel1) {
+              slot.innerHTML = `
+                <div class="slot-content">
+                  <span class="slot-text">${termObj.fullTitle}</span>
+                  ${termObj.desc ? `<button class="info-toggle" title="Посмотреть определение"><svg><use href="#icon-info"></use></svg></button>` : ''}
+                </div>
+              `;
+              slot.className = "slot filled category-slot-filled"; 
+            } else {
+              slot.innerHTML = `
+                <div class="slot-content">
+                  <span class="slot-text">${termObj.text}</span>
+                  ${termObj.desc ? `<button class="info-toggle" title="Посмотреть определение"><svg><use href="#icon-info"></use></svg></button>` : ''}
+                </div>
+              `;
+              slot.className = "slot filled"; 
+            }
+            
+            slot.dataset.filled = "true";
+            slot.dataset.termId = termObj.id;
+            slot.dataset.desc = termObj.desc;
+            
+            if (termObj.desc) {
+              const infoPanel = document.createElement('div');
+              infoPanel.className = 'info-panel';
+              infoPanel.textContent = termObj.desc;
+              slot.parentNode.appendChild(infoPanel);
+
+              const btnInfo = slot.querySelector('.info-toggle');
+              if(btnInfo) {
+                btnInfo.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  infoPanel.classList.toggle('active');
+                });
+              }
+            }
+
+            playSuccessSound();
+            if (navigator.vibrate) navigator.vibrate(30);
+            
+            bankTerms = bankTerms.filter(t => t.id !== selectedTermId);
+            selectedTermId = null;
+            
+            slots.forEach(s => s.classList.remove('highlight'));
+            renderBank();
+          } else {
+            // ОШИБКА
+            slot.classList.remove('highlight');
+            slot.classList.remove('error-anim');
+            void slot.offsetWidth; 
+            slot.classList.add('error-anim');
+            if(navigator.vibrate) navigator.vibrate([50, 100]); 
+          }
+        });
+      });
+    }
+
+    // --- СИСТЕМНЫЕ ФУНКЦИИ ---
+    function requestFullScreenSafe() {
+      try {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          // Безопасный вызов полноэкранного режима, исключающий падение в Safari/iOS
+          if (htmlEl.requestFullscreen) {
+            const req = htmlEl.requestFullscreen();
+            if (req && typeof req.catch === 'function') req.catch(() => {});
+          } else if (htmlEl.webkitRequestFullscreen) {
+            htmlEl.webkitRequestFullscreen(); 
+          }
+        }
+      } catch (e) {
+        console.warn("Fullscreen API не поддерживается:", e);
+      }
+    }
+
+    function toggleFullScreen() {
+      try {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) requestFullScreenSafe();
+        else {
+          if (document.exitFullscreen) document.exitFullscreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        }
+      } catch (e) {}
+    }
+
+    btnStart.addEventListener('click', () => {
+      try {
+        initAudio();
+        requestFullScreenSafe();
+      } catch (e) {
+        console.error("Ошибка инициализации:", e);
+      }
+      
+      splashScreen.classList.add('hidden');
+      setTimeout(() => {
+        splashScreen.style.display = 'none';
+        appUi.classList.add('visible');
+        loadPlan(currentPlanIndex);
+      }, 500);
+    });
+
+    btnFullscreen.addEventListener('click', toggleFullScreen);
+
+    const updateFullscreenIcon = () => {
+      const isFull = document.fullscreenElement || document.webkitFullscreenElement;
+      document.getElementById('icon-fullscreen-use').setAttribute('href', isFull ? '#icon-minimize' : '#icon-maximize');
+    };
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+
+    btnTheme.addEventListener('click', () => {
+      currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+      htmlEl.setAttribute('data-theme', currentTheme);
+      document.getElementById('icon-theme-use').setAttribute('href', currentTheme === 'light' ? '#icon-moon' : '#icon-sun');
+    });
+
+  </script>
+</body>
+</html>
